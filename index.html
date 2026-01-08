@@ -170,6 +170,14 @@
         const r3Keywords = ["歌詞有人體部位 (手/眼/咀...)", "關於顏色 (紅/黑/白...)", "歌詞有愛字", "關於時間 (秒/分/鐘)", "關於天氣 (晴/雨/雲)"];
         let topicIdx = 0;
 
+        // 新增：Fisher-Yates 洗牌函數
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
         function showRules(r) {
             currentRound = r;
             document.getElementById('home-screen').classList.remove('active');
@@ -190,6 +198,9 @@
             if(currentRound === 1) {
                 document.getElementById('round1-content').style.display = 'block';
                 document.getElementById('generic-content').style.display = 'none';
+                
+                // 修改：開始 Round 1 前先洗牌，確保隨機性
+                shuffle(masterSongs);
                 idx = 0; 
                 loadVideo();
             } else {
@@ -212,7 +223,7 @@
         function loadVideo() {
             if(player) player.destroy();
             document.getElementById('round-info').innerText = `Song: ${idx + 1} / 32`;
-            document.getElementById('black-shield').style.display = 'flex'; // 載入新歌時確保遮罩存在
+            document.getElementById('black-shield').style.display = 'flex'; 
             player = new YT.Player('player-target', {
                 height: '100%', width: '100%', videoId: masterSongs[idx].id,
                 playerVars: { 'autoplay': 0, 'controls': 0, 'playsinline': 1, 'start': masterSongs[idx].s },
@@ -227,7 +238,7 @@
             player.seekTo(masterSongs[idx].s, true); 
             player.playVideo();
             document.getElementById('status-msg').innerText = "PLAYING...";
-            document.getElementById('black-shield').style.display = 'flex'; // 播放時維持遮罩
+            document.getElementById('black-shield').style.display = 'flex'; 
             document.getElementById('blanks').style.display = 'none';
             let elapsed = 0; let duration = masterSongs[idx].d;
             clearInterval(logicInt);
@@ -257,7 +268,6 @@
             document.getElementById('box-' + type).innerText = prefix[type] + val;
             document.getElementById('box-' + type).style.visibility = 'visible';
             
-            // 修改：只有當點擊「下一句」時，遮罩消失並繼續播放影片
             if(type === 'lyrics') {
                 document.getElementById('black-shield').style.display = 'none';
                 player.playVideo();
